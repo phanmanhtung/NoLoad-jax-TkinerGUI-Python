@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<Optimization>
+	<Iterations Number="5">
+		<Iteration Number="0" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="1.0" Name="z1"/>
+				<Input Value="0.0" Name="z2"/>
+			</Inputs>
+			<Outputs Number="2">
+				<Output Value="4.930380657631324e-32" Name="f1"/>
+				<Output Value="1.9999999999999996" Name="f2"/>
+			</Outputs>
+		</Iteration>
+		<Iteration Number="1" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="0.7675376858950047" Name="z1"/>
+				<Input Value="0.23260645861175888" Name="z2"/>
+			</Inputs>
+			<Outputs Number="2">
+				<Output Value="0.1081444920669537" Name="f1"/>
+				<Output Value="1.178006946633444" Name="f2"/>
+			</Outputs>
+		</Iteration>
+		<Iteration Number="2" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="0.42189498667114744" Name="z1"/>
+				<Input Value="0.578094035665158" Name="z2"/>
+			</Inputs>
+			<Outputs Number="2">
+				<Output Value="0.6683981205075813" Name="f1"/>
+				<Output Value="0.356000022519561" Name="f2"/>
+			</Outputs>
+		</Iteration>
+		<Iteration Number="3" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="0.18245773825730005" Name="z1"/>
+				<Input Value="0.8175721930393332" Name="z2"/>
+			</Inputs>
+			<Outputs Number="2">
+				<Output Value="1.336799640566514" Name="f1"/>
+				<Output Value="0.06657073100244774" Name="f2"/>
+			</Outputs>
+		</Iteration>
+		<Iteration Number="4" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="-0.0014656185891643858" Name="z1"/>
+				<Input Value="1.0011291927491142" Name="z2"/>
+			</Inputs>
+			<Outputs Number="2">
+				<Output Value="2.00519304579067" Name="f1"/>
+				<Output Value="3.4231141135553734e-06" Name="f2"/>
+			</Outputs>
+		</Iteration>
+	</Iterations>
+	<SPECIFICATIONS/>
+</Optimization>

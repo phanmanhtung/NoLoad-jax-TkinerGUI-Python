@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<Optimization>
+	<Iterations Number="7">
+		<Iteration Number="0" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="2.0" Name="x"/>
+				<Input Value="2.0" Name="y"/>
+			</Inputs>
+			<Outputs Number="3">
+				<Output Value="401.0" Name="fobj"/>
+				<Output Value="0.0" Name="ctr1"/>
+				<Output Value="2.0" Name="ctr2"/>
+			</Outputs>
+		</Iteration>
+		<Iteration Number="1" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="-2.0" Name="x"/>
+				<Input Value="2.0" Name="y"/>
+			</Inputs>
+			<Outputs Number="3">
+				<Output Value="409.0" Name="fobj"/>
+				<Output Value="-28.0" Name="ctr1"/>
+				<Output Value="-2.0" Name="ctr2"/>
+			</Outputs>
+		</Iteration>
+		<Iteration Number="2" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="0.0024937655860348684" Name="x"/>
+				<Input Value="2.0" Name="y"/>
+			</Inputs>
+			<Outputs Number="3">
+				<Output Value="400.99253114484287" Name="fobj"/>
+				<Output Value="-1.9925373443338938" Name="ctr1"/>
+				<Output Value="0.0024937655860348684" Name="ctr2"/>
+			</Outputs>
+		</Iteration>
+		<Iteration Number="3" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="1.001244551684219" Name="x"/>
+				<Input Value="2.0" Name="y"/>
+			</Inputs>
+			<Outputs Number="3">
+				<Output Value="99.50249142831902" Name="fobj"/>
+				<Output Value="-0.9999999980723029" Name="ctr1"/>
+				<Output Value="1.001244551684219" Name="ctr2"/>
+			</Outputs>
+		</Iteration>
+		<Iteration Number="4" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="0.9010686356795214" Name="x"/>
+				<Input Value="0.9999995364379686" Name="y"/>
+			</Inputs>
+			<Outputs Number="3">
+				<Output Value="3.5470023438483453" Name="fobj"/>
+				<Output Value="-0.000967818741884674" Name="ctr1"/>
+				<Output Value="-0.09893182788250998" Name="ctr2"/>
+			</Outputs>
+		</Iteration>
+		<Iteration Number="5" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="0.9778082881887933" Name="x"/>
+				<Input Value="1.0012849661388947" Name="y"/>
+			</Inputs>
+			<Outputs Number="3">
+				<Output Value="0.20457882597018226" Name="fobj"/>
+				<Output Value="-0.0012958949372163797" Name="ctr1"/>
+				<Output Value="-0.020906745672311988" Name="ctr2"/>
+			</Outputs>
+		</Iteration>
+		<Iteration Number="6" isBestSolution="false" isSolution="true">
+			<Inputs Number="2">
+				<Input Value="0.999978174648485" Name="x"/>
+				<Input Value="1.0000218253515145" Name="y"/>
+			</Inputs>
+			<Outputs Number="3">
+				<Output Value="4.291814800110759e-07" Name="fobj"/>
+				<Output Value="-2.182535152495113e-05" Name="ctr1"/>
+				<Output Value="-4.440892098500626e-16" Name="ctr2"/>
+			</Outputs>
+		</Iteration>
+	</Iterations>
+	<SPECIFICATIONS/>
+</Optimization>
