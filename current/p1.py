@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -31,39 +32,55 @@ def create_plot(option, option_list, df, bounds):
 
 ### Tk App ###
 
+
 class App:
     def __init__(self, root, options, option_list, df, bounds):
         self.root = root
         self.options = options
         self.selected_options = []  # Keep track of selected options
-        self.create_widgets()
         self.option_list = option_list
         self.df = df
         self.bounds = bounds
 
-    def create_widgets(self):
-        self.option_var = tk.StringVar(value=self.options)
-        self.option_listbox = tk.Listbox(self.root, listvariable=self.option_var, selectmode=tk.EXTENDED)
-        self.option_listbox.pack(padx=10, pady=5)
+        self.create_widgets()
 
-        #self.plot_button = tk.Button(self.root, text="Plot", command=self.plot_selected_options)
-        #self.plot_button.pack(pady=5)
+    def create_widgets(self):
+    # Create a Treeview widget
+        self.treeview = ttk.Treeview(self.root, columns=("Option", "Bound", "Specification", "Type"), show="headings")
+        self.treeview.pack(padx=10, pady=5)
+
+        # Add column headings
+        self.treeview.heading("Option", text="Option")
+        self.treeview.heading("Bound", text="Bound")
+        self.treeview.heading("Specification", text="Specification")
+        self.treeview.heading("Type", text="Type")
+
+        # Add options and additional information
+        for option in self.options:
+            self.treeview.insert("", "end", values=(option, self.bounds.Value[option], "specification", self.bounds.Type[option]))
+
+        # Create a scrollbar for the Treeview
+        scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=self.treeview.yview)
+        self.treeview.configure(yscroll=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+
+        # Create a context menu for the Treeview
+        self.option_menu = tk.Menu(self.root, tearoff=False)
+        self.option_menu.add_command(label="Additional Info", command=self.show_additional_info)
+        self.option_menu.entryconfigure(0, state="disabled")  # Disable the "Additional Info" menu item initially
+        self.treeview.bind("<Button-3>", self.show_context_menu)
 
         self.exit_button = tk.Button(self.root, text="Exit", command=self.exit_program)
         self.exit_button.pack(pady=5)
 
-        # Create a context menu for the option listbox
-        self.option_menu = tk.Menu(self.root, tearoff=False)
-        self.option_menu.add_command(label="Additional Info", command=self.show_additional_info)
-        self.option_listbox.bind("<Button-3>", self.show_context_menu)
-
     def show_context_menu(self, event):
-        selection = self.option_listbox.curselection()
+        selection = self.treeview.selection()
         if selection:
-            self.selected_options = [self.options[index] for index in selection]  # Update selected options
+            self.selected_options = [self.options[self.treeview.index(item)] for item in selection]  # Update selected options
             menu_label = f"Additional Info ({len(self.selected_options)} options selected)"
             self.option_menu.entryconfigure(0, label=menu_label)
-            if len(self.selected_options)>1:
+            self.option_menu.entryconfigure(0, state="normal")  # Enable the "Additional Info" menu item
+            if len(self.selected_options) > 1:
                 self.option_menu.entryconfigure(1, label="Plot", command=self.plot_multiple_selected_options)
             else:
                 self.option_menu.entryconfigure(1, label="Plot", command=self.plot_one_selected_option)
@@ -87,7 +104,6 @@ class App:
         
         plt.show()
 
-
     def plot_one_selected_option(self):
         
         selected_option = self.selected_options[0]
@@ -96,19 +112,27 @@ class App:
         ax.plot(self.df['IterationNumber'], self.df[selected_option])
         ax.scatter(self.df['IterationNumber'], self.df[selected_option])
 
-        current_bound = self.bounds[selected_option]
+        current_bound = self.bounds.Value[selected_option]
         if isinstance(current_bound, list):
             for i in current_bound:
-                ax.axhline(y=i, color='red', linestyle='--', label='Horizontal Line')
+                ax.axhline(y=i, color='red', linestyle='--', label=self.bounds.Type[selected_option])
+
 
         elif(isinstance(current_bound, int) or isinstance(current_bound, float)):
-            ax.axhline(y=current_bound, color='red', linestyle='--', label='Horizontal Line')
+            ax.axhline(y=current_bound, color='red', linestyle='--', label=self.bounds.Type[selected_option])
             #window = ImageWindow(self.root, fig, selected_option)
 
         ax.grid()
         ax.set_xlabel("IterationNumber")
         ax.set_ylabel(selected_option)
         ax.set_title(selected_option)
+
+        # Add the legend
+        handles, labels = ax.get_legend_handles_labels()
+        unique_handles = list(set(handles))
+        unique_labels = list(set(labels))
+        ax.legend(unique_handles, unique_labels, loc='upper right')
+
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.ticklabel_format(useOffset=False, style='plain')
         

@@ -10,7 +10,7 @@ import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 
-def preprocess_xml(xml_file_path, all_bounds):
+def preprocess_xml(xml_file_path):
   # Parse the XML file
   tree = ET.parse(xml_file_path)
   root = tree.getroot()
@@ -39,12 +39,8 @@ def preprocess_xml(xml_file_path, all_bounds):
   # Convert data to DataFrame
   df = pd.DataFrame(data)
   option_list = df.columns[3:].values.tolist()
-  unbounds = option_list - all_bounds.keys()
-
-  for i in unbounds:
-    all_bounds[i] = "free"
   
-  # P2 data
+  # P2 data: all_options = {options_name : [iter1, iter2, ...iter_n], ...}
   all_options = {}
 
   for i in range(len(option_list)):
@@ -53,11 +49,26 @@ def preprocess_xml(xml_file_path, all_bounds):
 
   return df, option_list, all_options
 
-def combine_dictionaries(*args):
-    combined_dict = {}
-    for dictionary in args:
-        combined_dict.update(dictionary)
-    return combined_dict
+def combine_all_bounds(bounds=None, objectives=None, eq_cstr=None, ineq_cstr=None, *args):
+    combined_df = pd.DataFrame()
+
+    if bounds:
+      df_bounds = pd.DataFrame({'Value': bounds.values(), "Type": "bound"}, index=bounds.keys())
+      combined_df = pd.concat([combined_df, df_bounds], axis=0)
+
+    if objectives:
+      df_objectives = pd.DataFrame({'Value': objectives.values(), "Type": "objective"}, index=objectives.keys())
+      combined_df = pd.concat([combined_df, df_objectives], axis=0)
+
+    if eq_cstr:
+      df_eq_cstr = pd.DataFrame({'Value': eq_cstr.values(), "Type": "eq_cstr"}, index=eq_cstr.keys())
+      combined_df = pd.concat([combined_df, df_eq_cstr], axis=0)
+
+    if ineq_cstr:
+      df_ineq_cstr = pd.DataFrame({'Value': ineq_cstr.values(), "Type": "ineq_cstr"}, index=ineq_cstr.keys())
+      combined_df = pd.concat([combined_df, df_ineq_cstr], axis=0)
+
+    return combined_df
 
 # Path to your XML file
 
@@ -73,18 +84,15 @@ eq_cstr={'Debit': 60.0, 'Pression': 27.0} # equality constraints
 ineq_cstr={'Vsa': [200., 325.0], 'ctrle': [0.0, 5.0],'ctrld': [0.0, 5.0], 'BsDent':  [0.1, 1.7], 
            'BsCulasse':[0.1, 1.7],'BsDentExterne': [0.1, 1.7]}
 
-all_bounds = combine_dictionaries(bounds, objectives, eq_cstr, ineq_cstr)
-df, option_list, all_options = preprocess_xml(xml_file_path, all_bounds)
-objectives = list(objectives.keys())
-'''
+df, option_list, all_options = preprocess_xml(xml_file_path)
 
-xml_file_path = "Biobj.result"
-obj_dict={'f1':[0.,2.],'f2':[0.,2.]}
-bound_dict={'z1':[-5, 5], 'z2':[-5, 5]}
-objectives = list(obj_dict.keys())
-all_bounds = combine_dictionaries(obj_dict, objectives, bound_dict)
-df, option_list, all_options = preprocess_xml(xml_file_path, all_bounds)
-'''
+# all_bounds is in type DataFrame
+all_bounds = combine_all_bounds(bounds=bounds, objectives=objectives, eq_cstr=eq_cstr, ineq_cstr=ineq_cstr)
+unbounds = [x for x in option_list if x not in all_bounds]
+all_bounds = all_bounds.reindex(all_bounds.index.union(unbounds))
+objectives = list(objectives.keys())
+
+### Tk App ###
 
 root = tk.Tk()
 root.title("Notebook")
