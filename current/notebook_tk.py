@@ -39,15 +39,7 @@ def preprocess_xml(xml_file_path):
   # Convert data to DataFrame
   df = pd.DataFrame(data)
   option_list = df.columns[3:].values.tolist()
-  
-  # P2 data: all_options = {options_name : [iter1, iter2, ...iter_n], ...}
-  all_options = {}
-
-  for i in range(len(option_list)):
-    # Append a key/value pair
-    all_options[option_list[i]] = df[option_list[i]].values.tolist()
-
-  return df, option_list, all_options
+  return df, option_list
 
 def combine_all_bounds(bounds=None, objectives=None, eq_cstr=None, ineq_cstr=None, *args):
     combined_df = pd.DataFrame()
@@ -84,7 +76,7 @@ eq_cstr={'Debit': 60.0, 'Pression': 27.0} # equality constraints
 ineq_cstr={'Vsa': [200., 325.0], 'ctrle': [0.0, 5.0],'ctrld': [0.0, 5.0], 'BsDent':  [0.1, 1.7], 
            'BsCulasse':[0.1, 1.7],'BsDentExterne': [0.1, 1.7]}
 
-df, option_list, all_options = preprocess_xml(xml_file_path)
+df, option_list = preprocess_xml(xml_file_path)
 
 # all_bounds is in type DataFrame
 all_bounds = combine_all_bounds(bounds=bounds, objectives=objectives, eq_cstr=eq_cstr, ineq_cstr=ineq_cstr)
@@ -109,7 +101,7 @@ notebook.add(tab1, text="1-var-iteration")
 
 # Create the second tab and add the App and ImageWindow instances from program2
 tab2 = ttk.Frame(notebook)
-app2 = App2(tab2, all_options)
+app2 = App2(tab2, df)
 app2.update_options(option_list, option_list)
 
 notebook.add(tab2, text="2-var-plot")
@@ -117,7 +109,7 @@ notebook.add(tab2, text="2-var-plot")
 # Create the first tab and add the App and ImageWindow instances from program1
 tab3 = ttk.Frame(notebook)
 all_options3 = ["Updated_Pareto", "Pareto"]
-app3 = App3(tab3, all_options3, df, objectives)
+app3 = App3(tab3, ["Updated_Pareto", "Pareto"], df, objectives)
 notebook.add(tab3, text="Pareto")
 
 root.mainloop()

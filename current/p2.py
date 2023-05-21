@@ -5,14 +5,14 @@ import sys
 
 
 class App:
-    def __init__(self, root, myoptions):
+    def __init__(self, root, df):
         self.root = root
         self.x_options = []  # Empty list for X options initially
         self.y_options = []  # Empty list for Y options initially
         self.selected_x = tk.StringVar()
         self.selected_y = tk.StringVar()
         self.create_widgets()
-        self.myoptions = myoptions
+        self.df = df
 
     def create_widgets(self):
         self.option_frame = ttk.Frame(self.root)
@@ -47,17 +47,20 @@ class App:
         selected_y = self.selected_y.get()
 
         # Get the arrays of values for the selected options
-        x_values = self.myoptions[selected_x]
-        y_values = self.myoptions[selected_y]
+        x_values = self.df[selected_x].values
+        y_values = self.df[selected_y].values
 
         fig, ax = plt.subplots()
         ax.plot(x_values, y_values)
         ax.scatter(x_values, y_values)
+
+        for iteration, x, y in zip(self.df['IterationNumber'], x_values, y_values):
+            ax.annotate(iteration, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', va='bottom')
+
         ax.grid()
         ax.set_xlabel(selected_x)
         ax.set_ylabel(selected_y)
         ax.set_title(f"{selected_x} vs {selected_y}")
-        
 
         # Avoid scientific notations
         ax.ticklabel_format(useOffset=False, style='plain')

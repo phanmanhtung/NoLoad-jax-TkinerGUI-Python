@@ -45,7 +45,8 @@ class App:
         self.create_widgets()
 
     def create_widgets(self):
-    # Create a Treeview widget
+        
+        # Create a Treeview widget
         self.treeview = ttk.Treeview(self.root, columns=("Option", "Bound", "Specification", "Type"), show="headings")
         self.treeview.pack(padx=10, pady=5)
 
@@ -54,6 +55,18 @@ class App:
         self.treeview.heading("Bound", text="Bound")
         self.treeview.heading("Specification", text="Specification")
         self.treeview.heading("Type", text="Type")
+
+        # Define color tags based on type
+        type_colors = {
+            "eq_cstr": "green",
+            "ineq_cstr": "red",
+        }
+
+        # Add options and additional information
+        for option in self.options:
+            type_ = self.bounds.Type[option]
+            self.treeview.insert("", "end", values=(option, self.bounds.Value[option], "specification", type_), tags=(type_,))
+            self.treeview.tag_configure(type_, foreground=type_colors.get(type_, "black"))
 
         # Add options and additional information
         for option in self.options:
@@ -96,6 +109,12 @@ class App:
         for selected_option in self.selected_options:
             ax.plot(self.df['IterationNumber'], self.df[selected_option])
             ax.scatter(self.df['IterationNumber'], self.df[selected_option], label=f'{selected_option}')
+
+            if len(self.selected_options) <= 3:
+            # Label each dot
+                for iteration, x, y in zip(self.df['IterationNumber'], self.df['IterationNumber'], self.df[selected_option]):
+                    ax.annotate(iteration, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', va='bottom')
+
             ax.legend()
         ax.set_xlabel('Iteration Number')
         ax.set_ylabel('Option Values')
@@ -111,6 +130,11 @@ class App:
         fig, ax = plt.subplots()
         ax.plot(self.df['IterationNumber'], self.df[selected_option])
         ax.scatter(self.df['IterationNumber'], self.df[selected_option])
+
+        # Label each dot
+        for iteration, x, y in zip(self.df['IterationNumber'], self.df['IterationNumber'], self.df[selected_option]):
+            ax.annotate(iteration, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', va='bottom')
+
 
         current_bound = self.bounds.Value[selected_option]
         if isinstance(current_bound, list):

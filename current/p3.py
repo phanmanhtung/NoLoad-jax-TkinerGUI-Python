@@ -28,9 +28,10 @@ def exclude_dominated_points(pareto_front):
     return filtered_pareto_front
 
 def excluded_dataframe(df, objectives):
-    pareto_pts = df[objectives].values.tolist()
-    new_pareto_pts = exclude_dominated_points(pareto_pts)
-    updated_df = pd.DataFrame(new_pareto_pts, columns = objectives)
+    df['pareto_pts'] = df[objectives].values.tolist()
+    new_pareto_pts = exclude_dominated_points(df['pareto_pts'].values)
+    updated_df = df.loc[df['pareto_pts'].isin(new_pareto_pts)]
+    
     return updated_df
 
 
@@ -41,10 +42,11 @@ def plot_2d(ax, df, label, objectives):
     ax.set_xlabel(objectives[0])
     ax.set_ylabel(objectives[1])
     ax.ticklabel_format(useOffset=False, style='plain')
-    
+    for iteration, x, y in zip(df['IterationNumber'], df[objectives[0]], df[objectives[1]]):
+        ax.annotate(iteration, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', va='bottom')
+
     ax.grid()
     ax.set_title(label)
-
 
 ### Tk App ###
 
