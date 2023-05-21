@@ -95,15 +95,13 @@ notebook.pack(fill=tk.BOTH, expand=True)
 
 # Create the first tab and add the App and ImageWindow instances from program1
 tab1 = ttk.Frame(notebook)
-all_options1 = option_list # Define your all_options list here
-app1 = App1(tab1, all_options1, option_list, df, all_bounds)
+app1 = App1(tab1, option_list, df, all_bounds)
 notebook.add(tab1, text="1-var-iteration")
 
 # Create the second tab and add the App and ImageWindow instances from program2
 tab2 = ttk.Frame(notebook)
 app2 = App2(tab2, df)
 app2.update_options(option_list, option_list)
-
 notebook.add(tab2, text="2-var-plot")
 
 # Create the first tab and add the App and ImageWindow instances from program1

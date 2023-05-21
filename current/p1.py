@@ -26,26 +26,25 @@ def plot_result(df, target, bound=[]):
 
     return fig
 
-def create_plot(option, option_list, df, bounds):
-    for i in range(len(option_list)):
-       if option == option_list[i] : return plot_result(df, option, bounds[option])
+def create_plot(option, options, df, bounds):
+    for i in range(len(options)):
+       if option == options[i] : return plot_result(df, option, bounds[option])
 
 ### Tk App ###
 
 
 class App:
-    def __init__(self, root, options, option_list, df, bounds):
+    def __init__(self, root, options, df, bounds):
         self.root = root
         self.options = options
         self.selected_options = []  # Keep track of selected options
-        self.option_list = option_list
         self.df = df
         self.bounds = bounds
 
         self.create_widgets()
 
     def create_widgets(self):
-        
+
         # Create a Treeview widget
         self.treeview = ttk.Treeview(self.root, columns=("Option", "Bound", "Specification", "Type"), show="headings")
         self.treeview.pack(padx=10, pady=5)
@@ -67,10 +66,6 @@ class App:
             type_ = self.bounds.Type[option]
             self.treeview.insert("", "end", values=(option, self.bounds.Value[option], "specification", type_), tags=(type_,))
             self.treeview.tag_configure(type_, foreground=type_colors.get(type_, "black"))
-
-        # Add options and additional information
-        for option in self.options:
-            self.treeview.insert("", "end", values=(option, self.bounds.Value[option], "specification", self.bounds.Type[option]))
 
         # Create a scrollbar for the Treeview
         scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=self.treeview.yview)
