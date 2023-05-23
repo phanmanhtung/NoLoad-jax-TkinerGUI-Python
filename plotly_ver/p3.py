@@ -1,6 +1,6 @@
 import tkinter as tk
-import matplotlib.pyplot as plt
 import sys
+import plotly.express as px
 
 ### Exclude Dominated Point ###
 
@@ -33,19 +33,40 @@ def excluded_dataframe(df, objectives):
     
     return updated_df
 
+def plot_2d(df, label, objectives):
 
-def plot_2d(ax, df, label, objectives):
+    fig = px.scatter(
+        df,
+        x=objectives[0],
+        y=objectives[1],
+        hover_data={'IterationNumber': True},
+        title=label
+    )
 
-    ax.plot(df[objectives[0]], df[objectives[1]])
-    ax.scatter(df[objectives[0]], df[objectives[1]])
-    ax.set_xlabel(objectives[0])
-    ax.set_ylabel(objectives[1])
-    ax.ticklabel_format(useOffset=False, style='plain')
-    for iteration, x, y in zip(df['IterationNumber'], df[objectives[0]], df[objectives[1]]):
-        ax.annotate(iteration, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', va='bottom')
+    fig.update_traces(mode='lines+markers')
 
-    ax.grid()
-    ax.set_title(label)
+    # Add annotations
+    annotations = [
+        dict(
+            x=x,
+            y=y,
+            text=str(iteration),
+            showarrow=True,
+            arrowhead=1,
+            ax=0,
+            ay=-20
+        )
+        for iteration, x, y in zip(df['IterationNumber'], df[objectives[0]], df[objectives[1]])
+    ]
+    fig.update_layout(annotations=annotations)
+
+    config = {
+        'modeBarButtonsToAdd': [
+            'downloadImage'
+        ]
+    }
+    fig.show(config=config)
+
 
 ### Tk App ###
 
@@ -94,24 +115,17 @@ class App:
 
         if self.selected_options[0] == "Pareto":
 
-            fig, ax = plt.subplots()
-            plot_2d(ax, self.df, self.selected_options[0], self.objectives)
-            plt.show()
-
+            plot_2d(self.df, self.selected_options[0], self.objectives)
         else:
-            fig, ax = plt.subplots()
-            updated_df = excluded_dataframe(self.df, self.objectives)
 
-            plot_2d(ax, updated_df, self.selected_options[0], self.objectives)
-            plt.show()
+            updated_df = excluded_dataframe(self.df, self.objectives)
+            plot_2d(updated_df, self.selected_options[0], self.objectives)
+
 
     def plot_multiple_selected_options(self):
-        fig, ax = plt.subplots()
-        plot_2d(ax, self.df, self.selected_options[0], self.objectives)
+        plot_2d(self.df, self.selected_options[0], self.objectives)
         updated_df = excluded_dataframe(self.df, self.objectives)
-
-        plot_2d(ax, updated_df, self.selected_options[1], self.objectives)
-        plt.show()
+        plot_2d(updated_df, self.selected_options[0], self.objectives)
 
     def exit_program(self):
         sys.exit()

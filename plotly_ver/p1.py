@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 import sys
+import plotly.graph_objects as go
+import plotly.express as px
 
 ### Tk App ###
 
@@ -54,6 +54,7 @@ class App:
         self.exit_button = tk.Button(self.root, text="Exit", command=self.exit_program)
         self.exit_button.pack(pady=5)
 
+
     def show_context_menu(self, event):
         selection = self.treeview.selection()
         if selection:
@@ -67,68 +68,126 @@ class App:
                 self.option_menu.entryconfigure(1, label="Plot", command=self.plot_one_selected_option)
             self.option_menu.tk_popup(event.x_root, event.y_root)
 
+
     def show_additional_info(self):
         for selected_option in self.selected_options:
             print(f"Additional info for {selected_option}")
 
 
     def plot_multiple_selected_options(self):
-        fig, ax = plt.subplots()
+
+        fig = go.Figure()
+        fig_title = "1d-plot: "
+
         for selected_option in self.selected_options:
-            ax.plot(self.df['IterationNumber'], self.df[selected_option])
-            ax.scatter(self.df['IterationNumber'], self.df[selected_option], label=f'{selected_option}')
+            fig_title += (str(selected_option) + " ")
+            fig.add_trace(go.Scatter(x=self.df['IterationNumber'], 
+                                     y=self.df[selected_option], 
+                                     mode='lines+markers', 
+                                     name=selected_option,
+                                     hovertemplate=f"{'IterationNumber'}=%{{x}}<br>{selected_option}=%{{y:.2f}}<extra></extra>"))
 
             if len(self.selected_options) <= 3:
-            # Label each dot
+                # Label each dot
                 for iteration, x, y in zip(self.df['IterationNumber'], self.df['IterationNumber'], self.df[selected_option]):
-                    ax.annotate(iteration, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', va='bottom')
+                    fig.add_annotation(x=x, y=y, text=str(iteration), showarrow=True, arrowhead=1, ax=0, ay=-20)
 
-            ax.legend()
-        ax.set_xlabel('Iteration Number')
-        ax.set_ylabel('Option Values')
-        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.ticklabel_format(useOffset=False, style='plain')
-        
-        plt.show()
+        fig.update_layout(
+            title={
+            'text': fig_title,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'
+            },
+            xaxis_title='Iteration Number',
+            yaxis_title='Option Values',
+            xaxis=dict(tickmode='linear'),
+            yaxis=dict(tickformat='g'),
+            legend=dict(x=1, y=1)
+        )
+
+        config = {
+            'modeBarButtonsToAdd': [
+                'downloadImage'
+            ]
+        }
+        fig.show(config=config)
 
     def plot_one_selected_option(self):
-        
         selected_option = self.selected_options[0]
 
-        fig, ax = plt.subplots()
-        ax.plot(self.df['IterationNumber'], self.df[selected_option])
-        ax.scatter(self.df['IterationNumber'], self.df[selected_option])
+        color = 'blue'  # Set the desired color value
+
+        fig = px.line(
+            self.df,
+            x='IterationNumber',
+            y=selected_option,
+            title="1d-plot: " + str(selected_option),
+            labels={'IterationNumber': 'Iteration Number', selected_option: selected_option},
+            hover_data={'IterationNumber': True, selected_option: ':.2f'},
+            color_discrete_sequence=[color]
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=self.df['IterationNumber'],
+                y=self.df[selected_option],
+                mode='markers',
+                name=selected_option,
+                hovertemplate=f"{'IterationNumber'}=%{{x}}<br>{selected_option}=%{{y:.2f}}<extra></extra>",
+                marker=dict(color=color)
+            )
+        )
 
         # Label each dot
         for iteration, x, y in zip(self.df['IterationNumber'], self.df['IterationNumber'], self.df[selected_option]):
-            ax.annotate(iteration, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', va='bottom')
-
+            fig.add_annotation(x=x, y=y, text=str(iteration), showarrow=True, arrowhead=1, ax=0, ay=-20)
 
         current_bound = self.bounds.Value[selected_option]
+
         if isinstance(current_bound, list):
             for i in current_bound:
-                ax.axhline(y=i, color='red', linestyle='--', label=current_bound)
+                fig.add_shape(
+                    type="line",
+                    x0=self.df['IterationNumber'].min(),
+                    y0=i,
+                    x1=self.df['IterationNumber'].max(),
+                    y1=i,
+                    line=dict(color='red', dash='dash'),
+                    name=self.bounds.Type[selected_option]
+                )
 
+        elif isinstance(current_bound, (int, float)):
+            fig.add_shape(
+                type="line",
+                x0=self.df['IterationNumber'].min(),
+                y0=current_bound,
+                x1=self.df['IterationNumber'].max(),
+                y1=current_bound,
+                line=dict(color='red', dash='dash'),
+                name=self.bounds.Type[selected_option]
+            )
 
-        elif(isinstance(current_bound, int) or isinstance(current_bound, float)):
-            ax.axhline(y=current_bound, color='red', linestyle='--', label=current_bound)
-            #window = ImageWindow(self.root, fig, selected_option)
-
-        ax.grid()
-        ax.set_xlabel("IterationNumber")
-        ax.set_ylabel(selected_option)
-        ax.set_title(selected_option)
-
-        # Add the legend
-        handles, labels = ax.get_legend_handles_labels()
-        unique_handles = list(set(handles))
-        unique_labels = list(set(labels))
-        ax.legend(unique_handles, unique_labels, loc='upper right')
-
-        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.ticklabel_format(useOffset=False, style='plain')
+        fig.update_layout(
+            title={
+            'text': "1d-plot: " + str(selected_option),
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'
+            },
+            xaxis_title='Iteration Number',
+            yaxis_title=selected_option,
+            xaxis=dict(tickmode='linear'),
+            yaxis=dict(tickformat='g'),
+            legend=dict(x=1, y=1)
+        )
         
-        plt.show()
+        config = {
+            'modeBarButtonsToAdd': [
+                'downloadImage'
+            ]
+        }
+        fig.show(config=config)
 
     def exit_program(self):
         sys.exit()
