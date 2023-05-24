@@ -62,7 +62,10 @@ class App:
             fig.add_annotation(x=x, y=y, text=str(iteration), showarrow=True, arrowhead=1, ax=0, ay=-20)
 
         fig.update_layout(
-            title=f"{selected_x} vs {selected_y}",
+            title={'text':f"{selected_x} vs {selected_y}",
+                   'x': 0.5,
+                   'xanchor': 'center',
+                   'yanchor': 'top'},
             xaxis_title=selected_x,
             yaxis_title=selected_y,
             hovermode='closest',

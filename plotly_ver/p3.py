@@ -1,6 +1,7 @@
 import tkinter as tk
 import sys
 import plotly.express as px
+import plotly.graph_objects as go
 
 ### Exclude Dominated Point ###
 
@@ -40,7 +41,6 @@ def plot_2d(df, label, objectives):
         x=objectives[0],
         y=objectives[1],
         hover_data={'IterationNumber': True},
-        title=label
     )
 
     fig.update_traces(mode='lines+markers')
@@ -60,6 +60,13 @@ def plot_2d(df, label, objectives):
     ]
     fig.update_layout(annotations=annotations)
 
+    fig.update_layout(
+        title={'text':label,
+                   'x': 0.5,
+                   'xanchor': 'center',
+                   'yanchor': 'top'},
+        )
+
     config = {
         'modeBarButtonsToAdd': [
             'downloadImage'
@@ -78,6 +85,7 @@ class App:
         self.create_widgets()
         self.df = df
         self.objectives = objectives
+        self.updated_df = excluded_dataframe(self.df, self.objectives)
 
     def create_widgets(self):
         self.option_var = tk.StringVar(value=self.options)
@@ -116,16 +124,68 @@ class App:
         if self.selected_options[0] == "Pareto":
 
             plot_2d(self.df, self.selected_options[0], self.objectives)
+
         else:
 
-            updated_df = excluded_dataframe(self.df, self.objectives)
-            plot_2d(updated_df, self.selected_options[0], self.objectives)
+            plot_2d(self.updated_df, self.selected_options[0], self.objectives)
 
 
     def plot_multiple_selected_options(self):
-        plot_2d(self.df, self.selected_options[0], self.objectives)
-        updated_df = excluded_dataframe(self.df, self.objectives)
-        plot_2d(updated_df, self.selected_options[0], self.objectives)
+
+        color = 'blue'  # Set the desired color value
+
+        fig = px.scatter(
+            self.df,
+            x=self.objectives[0],
+            y=self.objectives[1],
+            hover_data={'IterationNumber': True},
+
+            color_discrete_sequence=[color]
+            )
+
+        fig.add_trace(
+            go.Scatter(
+                x=self.updated_df[self.objectives[0]],
+                y=self.updated_df[self.objectives[1]],
+                mode='lines',
+                hovertemplate=f"<br>{self.objectives[0]}=%{{x}}<br>{self.objectives[1]}=%{{y:.2f}}<extra></extra>",
+                marker=dict(color=color)
+            )
+        )
+
+        # Add annotations
+        annotations = [
+            dict(
+                x=x,
+                y=y,
+                text=str(iteration),
+                showarrow=True,
+                arrowhead=1,
+                ax=0,
+                ay=-20
+            )
+            for iteration, x, y in zip(self.updated_df['IterationNumber'], 
+                                       self.updated_df[self.objectives[0]], 
+                                       self.updated_df[self.objectives[1]])
+        ]
+        fig.update_layout(annotations=annotations)
+
+        fig.update_layout(
+            title={
+            'text': "Pareto",
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'
+            }
+        )
+
+        config = {
+            'modeBarButtonsToAdd': [
+                'downloadImage'
+            ]
+        }
+        fig.show(config=config)
+
 
     def exit_program(self):
         sys.exit()
