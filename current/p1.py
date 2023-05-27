@@ -7,12 +7,12 @@ import sys
 ### Tk App ###
 
 class App:
-    def __init__(self, root, options, df, bounds):
+    def __init__(self, root, options, df, specifications):
         self.root = root
         self.options = options
         self.selected_options = []  # Keep track of selected options
         self.df = df
-        self.bounds = bounds
+        self.specifications = specifications
 
         self.create_widgets()
 
@@ -36,8 +36,8 @@ class App:
 
         # Add options and additional information
         for option in self.options:
-            type_ = self.bounds.Type[option]
-            self.treeview.insert("", "end", values=(option, self.bounds.Value[option], "specification", type_), tags=(type_,))
+            type_ = self.specifications.Type[option]
+            self.treeview.insert("", "end", values=(option, self.specifications.Value[option], "specification", type_), tags=(type_,))
             self.treeview.tag_configure(type_, foreground=type_colors.get(type_, "black"))
 
         # Create a scrollbar for the Treeview
@@ -104,14 +104,16 @@ class App:
             ax.annotate(iteration, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', va='bottom')
 
 
-        current_bound = self.bounds.Value[selected_option]
-        if isinstance(current_bound, list):
-            for i in current_bound:
-                ax.axhline(y=i, color='red', linestyle='--', label=current_bound)
+        current_spec = self.specifications.Value[selected_option]
+        current_type = self.specifications.Type[selected_option]
+        
+        if isinstance(current_spec, list):
+            for i in current_spec:
+                ax.axhline(y=i, color='red', linestyle='--', label=current_type)
 
 
-        elif(isinstance(current_bound, int) or isinstance(current_bound, float)):
-            ax.axhline(y=current_bound, color='red', linestyle='--', label=current_bound)
+        elif(isinstance(current_spec, int) or isinstance(current_spec, float)):
+            ax.axhline(y=current_spec, color='red', linestyle='--', label=current_type)
             #window = ImageWindow(self.root, fig, selected_option)
 
         ax.grid()

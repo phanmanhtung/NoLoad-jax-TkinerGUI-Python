@@ -7,12 +7,12 @@ import plotly.express as px
 ### Tk App ###
 
 class App:
-    def __init__(self, root, options, df, bounds):
+    def __init__(self, root, options, df, specifications):
         self.root = root
         self.options = options
         self.selected_options = []  # Keep track of selected options
         self.df = df
-        self.bounds = bounds
+        self.specifications = specifications
 
         self.create_widgets()
 
@@ -36,8 +36,8 @@ class App:
 
         # Add options and additional information
         for option in self.options:
-            type_ = self.bounds.Type[option]
-            self.treeview.insert("", "end", values=(option, self.bounds.Value[option], "specification", type_), tags=(type_,))
+            type_ = self.specifications.Type[option]
+            self.treeview.insert("", "end", values=(option, self.specifications.Value[option], "specification", type_), tags=(type_,))
             self.treeview.tag_configure(type_, foreground=type_colors.get(type_, "black"))
 
         # Create a scrollbar for the Treeview
@@ -143,10 +143,10 @@ class App:
         for iteration, x, y in zip(self.df['IterationNumber'], self.df['IterationNumber'], self.df[selected_option]):
             fig.add_annotation(x=x, y=y, text=str(iteration), showarrow=True, arrowhead=1, ax=0, ay=-20)
 
-        current_bound = self.bounds.Value[selected_option]
+        current_spec = self.specifications.Value[selected_option]
 
-        if isinstance(current_bound, list):
-            for i in current_bound:
+        if isinstance(current_spec, list):
+            for i in current_spec:
                 fig.add_shape(
                     type="line",
                     x0=self.df['IterationNumber'].min(),
@@ -154,18 +154,18 @@ class App:
                     x1=self.df['IterationNumber'].max(),
                     y1=i,
                     line=dict(color='red', dash='dash'),
-                    name=self.bounds.Type[selected_option]
+                    name=self.specifications.Type[selected_option]
                 )
 
-        elif isinstance(current_bound, (int, float)):
+        elif isinstance(current_spec, (int, float)):
             fig.add_shape(
                 type="line",
                 x0=self.df['IterationNumber'].min(),
-                y0=current_bound,
+                y0=current_spec,
                 x1=self.df['IterationNumber'].max(),
-                y1=current_bound,
+                y1=current_spec,
                 line=dict(color='red', dash='dash'),
-                name=self.bounds.Type[selected_option]
+                name=self.specifications.Type[selected_option]
             )
 
         fig.update_layout(
