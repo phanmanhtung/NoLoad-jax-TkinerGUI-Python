@@ -38,12 +38,25 @@ def preprocess_xml(xml_file_path):
   option_list = df.columns[3:].values.tolist()
 
   # Extract specifications from XML
+  bounds = root.find("SPECIFICATIONS/BoundsOfInputs")
   objective_functions = root.find("SPECIFICATIONS/ObjectiveFunctions")
   equality_constraints = root.find("SPECIFICATIONS/EqualityConstraints")
   inequality_constraints = root.find("SPECIFICATIONS/InequalityConstraints")
   free_outputs = root.find("SPECIFICATIONS/FreeOutputs")
 
   all_dfs_array = []
+
+  # Extract bounds
+  bounds_data = []
+  for bound in bounds.iter("Bounds"):
+     bound_name = bound.get("Name")
+     bound_value = bound.get("Value")
+     bounds_data.append({"Name":bound_name, "Value":literal_eval(bound_value)})
+
+  df_bounds = pd.DataFrame(bounds_data)
+  df_bounds["Type"] = "bounds"
+
+  all_dfs_array.append(df_bounds)
 
   # Extract objective function data
   objective_functions_data = []
@@ -123,18 +136,6 @@ def preprocess_xml(xml_file_path):
 
 xml_file_path = "data/example20_new.result"
 df, option_list, specifications_df, objectives = preprocess_xml(xml_file_path)
-bounds = {'p': [1.0, 20.0], 'f': [1.0, 1000.0], 'Ns': [1000.0, 1150.0],
-          'Isa': [0.1, 100.0], 'j': [1.0, 10.0], 'g': [0.001, 1.0],
-          'Ld': [0.001, 0.2], 'He': [0.001, 0.5], 'Lc': [0.001, 0.5],
-          'Hc': [0.001, 0.5], 'Ps': [0.005, 1.0], 'ent': [0.002, 0.003],
-          'd': [0.01, 0.1], 'Tinduit': [700.0, 720.0], 'Tbob': [100.0, 120.0]}
-
-df_bounds = pd.DataFrame({'Value': bounds.values(), "Type": "bound"}, index=bounds.keys())
-specifications_df = pd.concat([specifications_df, df_bounds], axis=0)
-
-#unbounds = [x for x in option_list if x not in specifications_df.index]
-#print(unbounds)
-#specifications_df = specifications_df.reindex(specifications_df.index.union(unbounds))
 
 ### Tk App ###
 

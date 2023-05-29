@@ -723,6 +723,23 @@
 		</Iteration>
 	</Iterations>
 	<SPECIFICATIONS>
+		<BoundsOfInputs Number="15">
+			<Bounds Value="[1.0, 20.0]" Name="p"/>
+			<Bounds Value="[1.0, 1000.0]" Name="f"/>
+			<Bounds Value="[1000.0, 1150.0]" Name="Ns"/>
+			<Bounds Value="[0.1, 100.0]" Name="Isa"/>
+			<Bounds Value="[1.0, 10.0]" Name="j"/>
+			<Bounds Value="[0.001, 1.0]" Name="g"/>
+			<Bounds Value="[0.001, 0.2]" Name="Ld"/>
+			<Bounds Value="[0.001, 0.5]" Name="He"/>
+			<Bounds Value="[0.001, 0.5]" Name="Lc"/>
+			<Bounds Value="[0.001, 0.5]" Name="Hc"/>
+			<Bounds Value="[0.005, 1.0]" Name="Ps"/>
+			<Bounds Value="[0.002, 0.003]" Name="ent"/>
+			<Bounds Value="[0.01, 0.1]" Name="d"/>
+			<Bounds Value="[700.0, 720.0]" Name="Tinduit"/>
+			<Bounds Value="[100.0, 120.0]" Name="Tbob"/>
+		</BoundsOfInputs>
 		<ObjectiveFunctions Number="2">
 			<Objective Value="[0.0, 1.0]" Name="Volume"/>
 			<Objective Value="[0.0, 900.0]" Name="PertesTotales"/>
