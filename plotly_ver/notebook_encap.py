@@ -78,8 +78,8 @@ class MyApp:
         # all_bounds is in type DataFrame
         all_bounds = self.combine_all_bounds(bounds=self.bounds, objectives=self.objectives, eq_cstr=self.eq_cstr,
                                              ineq_cstr=self.ineq_cstr)
-        #unbounds = [x for x in option_list if x not in all_bounds]
-        #all_bounds = all_bounds.reindex(all_bounds.index.union(unbounds))
+        unbounds = [x for x in option_list if x not in all_bounds]
+        all_bounds = all_bounds.reindex(all_bounds.index.union(unbounds))
         objectives = list(self.objectives.keys())
 
         ### Tk App ###
