@@ -5,21 +5,13 @@ from p2 import App as App2
 from p3 import App as App3
 import xml.etree.ElementTree as ET
 import pandas as pd
+from ast import literal_eval
 
 class MyApp:
     def __init__(self):
         self.xml_file_path = "data/example20.result"
-        self.bounds = {'p': [1.0, 20.0], 'f': [1.0, 1000.0], 'Ns': [1000.0, 1150.0],
-                       'Isa': [0.1, 100.0], 'j': [1.0, 10.0], 'g': [0.001, 1.0],
-                       'Ld': [0.001, 0.2], 'He': [0.001, 0.5], 'Lc': [0.001, 0.5],
-                       'Hc': [0.001, 0.5], 'Ps': [0.005, 1.0], 'ent': [0.002, 0.003],
-                       'd': [0.01, 0.1], 'Tinduit': [700.0, 720.0], 'Tbob': [100.0, 120.0]}
-        self.objectives = {'Volume': [0.0, 1.], 'PertesTotales': [0.0, 900.0]}
-        self.eq_cstr = {'Debit': 60.0, 'Pression': 27.0}
-        self.ineq_cstr = {'Vsa': [200., 325.0], 'ctrle': [0.0, 5.0], 'ctrld': [0.0, 5.0],
-                          'BsDent': [0.1, 1.7], 'BsCulasse': [0.1, 1.7], 'BsDentExterne': [0.1, 1.7]}
 
-    def preprocess_xml(self, xml_file_path):
+    def preprocess_xml(xml_file_path):
         # Parse the XML file
         tree = ET.parse(xml_file_path)
         root = tree.getroot()
@@ -34,8 +26,7 @@ class MyApp:
             outputs = iteration.find("Outputs")
 
             inputs_data = {input_elem.get("Name"): float(input_elem.get("Value")) for input_elem in inputs.iter("Input")}
-            outputs_data = {output_elem.get("Name"): float(output_elem.get("Value")) for output_elem in
-                            outputs.iter("Output")}
+            outputs_data = {output_elem.get("Name"): float(output_elem.get("Value")) for output_elem in outputs.iter("Output")}
 
             iteration_data = {
                 "IterationNumber": iteration_number,
@@ -49,38 +40,104 @@ class MyApp:
         # Convert data to DataFrame
         df = pd.DataFrame(data)
         option_list = df.columns[3:].values.tolist()
-        return df, option_list
 
-    def combine_all_bounds(self, bounds=None, objectives=None, eq_cstr=None, ineq_cstr=None, *args):
-        combined_df = pd.DataFrame()
+        # Extract specifications from XML
+        bounds = root.find("SPECIFICATIONS/BoundsOfInputs")
+        objective_functions = root.find("SPECIFICATIONS/ObjectiveFunctions")
+        equality_constraints = root.find("SPECIFICATIONS/EqualityConstraints")
+        inequality_constraints = root.find("SPECIFICATIONS/InequalityConstraints")
+        free_outputs = root.find("SPECIFICATIONS/FreeOutputs")
 
-        if bounds:
-            df_bounds = pd.DataFrame({'Value': bounds.values(), "Type": "bound"}, index=bounds.keys())
-            combined_df = pd.concat([combined_df, df_bounds], axis=0)
+        all_dfs_array = []
 
-        if objectives:
-            df_objectives = pd.DataFrame({'Value': objectives.values(), "Type": "objective"}, index=objectives.keys())
-            combined_df = pd.concat([combined_df, df_objectives], axis=0)
+        # Extract bounds
+        bounds_data = []
+        for bound in bounds.iter("Bounds"):
+            bound_name = bound.get("Name")
+            bound_value = bound.get("Value")
+            bounds_data.append({"Name":bound_name, "Value":literal_eval(bound_value)})
 
-        if eq_cstr:
-            df_eq_cstr = pd.DataFrame({'Value': eq_cstr.values(), "Type": "eq_cstr"}, index=eq_cstr.keys())
-            combined_df = pd.concat([combined_df, df_eq_cstr], axis=0)
+        df_bounds = pd.DataFrame(bounds_data)
+        df_bounds["Type"] = "bounds"
 
-        if ineq_cstr:
-            df_ineq_cstr = pd.DataFrame({'Value': ineq_cstr.values(), "Type": "ineq_cstr"}, index=ineq_cstr.keys())
-            combined_df = pd.concat([combined_df, df_ineq_cstr], axis=0)
+        all_dfs_array.append(df_bounds)
 
-        return combined_df
+        # Extract objective function data
+        objective_functions_data = []
+        for obj_func in objective_functions.iter("Objective"):
+            objective_name = obj_func.get("Name")
+            objective_value = obj_func.get("Value")
+            objective_functions_data.append({"ObjectiveName": objective_name, "ObjectiveValue": literal_eval(objective_value)})
+
+        # Convert objective function data to DataFrame
+        df_objective_functions = pd.DataFrame(objective_functions_data)
+        df_objective_functions["Type"] = "objective"
+        df_objective_functions.columns = ["Name", "Value", "Type"]
+
+        objectives = df_objective_functions["Name"].values
+
+        all_dfs_array.append(df_objective_functions)
+
+        # Extract equality constraint data
+        if equality_constraints is not None:
+            equality_constraints_data = []
+            for eq_constraint in equality_constraints.iter("EqualityConstraint"):
+                constraint_name = eq_constraint.get("Name")
+                constraint_value = eq_constraint.get("Value")
+                equality_constraints_data.append({"ConstraintName": constraint_name, "ConstraintValue": literal_eval(constraint_value)})
+
+            # Convert equality constraint data to DataFrame
+            df_equality_constraints = pd.DataFrame(equality_constraints_data)
+
+            df_equality_constraints["Type"] = "eq_cstr"
+            df_equality_constraints.columns = ["Name", "Value", "Type"]
+
+            all_dfs_array.append(df_equality_constraints)
+
+        # Extract inequality constraint data
+        if inequality_constraints is not None:
+            inequality_constraints_data = []
+            for ineq_constraint in inequality_constraints.iter("InequalityConstraint"):
+                constraint_name = ineq_constraint.get("Name")
+                constraint_value = ineq_constraint.get("Value")
+                inequality_constraints_data.append({"ConstraintName": constraint_name, "ConstraintValue": literal_eval(constraint_value)})
+
+            # Convert inequality constraint data to DataFrame
+            df_inequality_constraints = pd.DataFrame(inequality_constraints_data)
+
+            df_inequality_constraints["Type"] = "ineq_cstr"
+            df_inequality_constraints.columns = ["Name", "Value", "Type"]
+
+            all_dfs_array.append(df_inequality_constraints)
+
+        # Extract free output data
+        if free_outputs is not None:
+            free_outputs_data = []
+            for free_output in free_outputs.iter("FreeOutput"):
+                output_name = free_output.get("Name")
+                free_outputs_data.append({"OutputName": output_name})
+
+            # Convert free output data to DataFrame
+            df_free_outputs = pd.DataFrame(free_outputs_data)
+        
+            df_free_outputs["Type"] = "free"
+            df_free_outputs.columns = ["Name", "Type"]
+
+            # Filter out the objectives
+            df_free_outputs = df_free_outputs[~df_free_outputs["Name"].isin(objectives)]
+
+            all_dfs_array.append(df_free_outputs)
+
+        specifications_df = pd.DataFrame(columns=["Name", "Value", "Type"])
+        for i in all_dfs_array:
+            specifications_df = pd.concat([specifications_df, i], axis=0)
+
+        specifications_df = specifications_df.set_index('Name')
+
+        return df, option_list, specifications_df, objectives
 
     def run(self):
-        df, option_list = self.preprocess_xml(self.xml_file_path)
-
-        # all_bounds is in type DataFrame
-        all_bounds = self.combine_all_bounds(bounds=self.bounds, objectives=self.objectives, eq_cstr=self.eq_cstr,
-                                             ineq_cstr=self.ineq_cstr)
-        unbounds = [x for x in option_list if x not in all_bounds]
-        all_bounds = all_bounds.reindex(all_bounds.index.union(unbounds))
-        objectives = list(self.objectives.keys())
+        df, option_list, specifications_df, objectives = self.preprocess_xml(self.xml_file_path)
 
         ### Tk App ###
 
@@ -93,7 +150,7 @@ class MyApp:
 
         # Create the first tab and add the App and ImageWindow instances from program1
         tab1 = ttk.Frame(notebook)
-        app1 = App1(tab1, option_list, df, all_bounds)
+        app1 = App1(tab1, option_list, df, specifications_df)
         notebook.add(tab1, text="1-var-iteration")
 
         # Create the second tab and add the App and ImageWindow instances from program2
@@ -108,6 +165,7 @@ class MyApp:
         notebook.add(tab3, text="Pareto")
 
         root.mainloop()
+
 
 if __name__ == '__main__':
     my_app = MyApp()

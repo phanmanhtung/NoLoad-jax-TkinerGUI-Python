@@ -159,7 +159,6 @@ notebook.add(tab2, text="2-var-plot")
 
 # Create the first tab and add the App and ImageWindow instances from program1
 tab3 = ttk.Frame(notebook)
-all_options3 = ["Updated_Pareto", "Pareto"]
 app3 = App3(tab3, ["Updated_Pareto", "Pareto"], df, objectives)
 notebook.add(tab3, text="Pareto")
 
