@@ -3,6 +3,7 @@ from tkinter import ttk
 import sys
 import plotly.graph_objects as go
 import plotly.express as px
+import math
 
 ### Tk App ###
 
@@ -19,12 +20,11 @@ class App:
     def create_widgets(self):
 
         # Create a Treeview widget
-        self.treeview = ttk.Treeview(self.root, columns=("Option", "Bound", "Specification", "Type"), show="headings")
+        self.treeview = ttk.Treeview(self.root, columns=("Option", "Specification", "Type"), show="headings")
         self.treeview.pack(padx=10, pady=5)
 
         # Add column headings
         self.treeview.heading("Option", text="Option")
-        self.treeview.heading("Bound", text="Bound")
         self.treeview.heading("Specification", text="Specification")
         self.treeview.heading("Type", text="Type")
 
@@ -37,7 +37,7 @@ class App:
         # Add options and additional information
         for option in self.options:
             type_ = self.specifications.Type[option]
-            self.treeview.insert("", "end", values=(option, self.specifications.Value[option], "specification", type_), tags=(type_,))
+            self.treeview.insert("", "end", values=(option, self.specifications.Value[option], type_), tags=(type_,))
             self.treeview.tag_configure(type_, foreground=type_colors.get(type_, "black"))
 
         # Create a scrollbar for the Treeview
@@ -116,7 +116,7 @@ class App:
     def plot_one_selected_option(self):
         selected_option = self.selected_options[0]
 
-        color = 'blue'  # Set the desired color value
+        color = 'midnightblue'  # Set the desired color value
 
         fig = px.line(
             self.df,
@@ -144,29 +144,37 @@ class App:
             fig.add_annotation(x=x, y=y, text=str(iteration), showarrow=True, arrowhead=1, ax=0, ay=-20)
 
         current_spec = self.specifications.Value[selected_option]
+        current_type = self.specifications.Type[selected_option]
 
         if isinstance(current_spec, list):
             for i in current_spec:
+                if i == current_spec[0]:
+                    color = 'blue' if current_type == 'bounds' else 'grey'  # Set color for the first line
+                else:
+                    color = 'red' if current_type == 'bounds' else 'grey'  # Set color for the second line
+
                 fig.add_shape(
                     type="line",
                     x0=self.df['IterationNumber'].min(),
                     y0=i,
                     x1=self.df['IterationNumber'].max(),
                     y1=i,
-                    line=dict(color='red', dash='dash'),
-                    name=self.specifications.Type[selected_option]
+                    line=dict(color=color, dash='dash'),
+                    name=current_type
                 )
 
-        elif isinstance(current_spec, (int, float)):
+        elif isinstance(current_spec, (int, float)) and not math.isnan(current_spec):
+            color = 'black' if current_type == 'eq_cstr' else 'red'  # Set color based on type
             fig.add_shape(
                 type="line",
                 x0=self.df['IterationNumber'].min(),
                 y0=current_spec,
                 x1=self.df['IterationNumber'].max(),
                 y1=current_spec,
-                line=dict(color='red', dash='dash'),
-                name=self.specifications.Type[selected_option]
+                line=dict(color=color, dash='dash'),
+                name=current_type
             )
+
 
         fig.update_layout(
             title={
