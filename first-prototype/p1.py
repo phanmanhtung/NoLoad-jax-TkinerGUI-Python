@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import tkinter as tk
 from tkinter import messagebox
 import pandas as pd
@@ -172,7 +171,6 @@ class App:
     def exit_program(self):
         sys.exit()
 
-=======
 import tkinter as tk
 from tkinter import messagebox
 import pandas as pd
@@ -346,4 +344,3 @@ class App:
     def exit_program(self):
         sys.exit()
 
->>>>>>> main

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import tkinter as tk
 from tkinter import ttk
 from p1 import App as App1
@@ -107,7 +106,7 @@ app2.update_options(option_list, option_list)
 notebook.add(tab2, text="Program 2")
 
 root.mainloop()
-=======
+
 import tkinter as tk
 from tkinter import ttk
 from p1 import App as App1
@@ -216,4 +215,3 @@ app2.update_options(option_list, option_list)
 notebook.add(tab2, text="Program 2")
 
 root.mainloop()
->>>>>>> main

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
@@ -80,7 +79,7 @@ class App:
 
         window = ImageWindow(self.root, fig, f"{selected_x} vs {selected_y}")
 
-=======
+
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
@@ -162,4 +161,3 @@ class App:
 
         window = ImageWindow(self.root, fig, f"{selected_x} vs {selected_y}")
 
->>>>>>> main

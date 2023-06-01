@@ -51,7 +51,8 @@ def preprocess_xml(xml_file_path):
   for bound in bounds.iter("Bounds"):
      bound_name = bound.get("Name")
      bound_value = bound.get("Value")
-     bounds_data.append({"Name":bound_name, "Value":literal_eval(bound_value)})
+     bound_in_out = bound.get("Type")
+     bounds_data.append({"Name":bound_name, "Value":literal_eval(bound_value), "In_Out":bound_in_out})
 
   df_bounds = pd.DataFrame(bounds_data)
   df_bounds["Type"] = "bounds"
@@ -63,12 +64,15 @@ def preprocess_xml(xml_file_path):
   for obj_func in objective_functions.iter("Objective"):
       objective_name = obj_func.get("Name")
       objective_value = obj_func.get("Value")
-      objective_functions_data.append({"ObjectiveName": objective_name, "ObjectiveValue": literal_eval(objective_value)})
+      objective_in_out = obj_func.get("Type")
+      objective_functions_data.append({"ObjectiveName": objective_name, 
+                                       "ObjectiveValue": literal_eval(objective_value), 
+                                       "In_Out":objective_in_out})
 
   # Convert objective function data to DataFrame
   df_objective_functions = pd.DataFrame(objective_functions_data)
   df_objective_functions["Type"] = "objective"
-  df_objective_functions.columns = ["Name", "Value", "Type"]
+  df_objective_functions.columns = ["Name", "Value", "In_Out", "Type"]
 
   objectives = df_objective_functions["Name"].values
 
@@ -80,13 +84,16 @@ def preprocess_xml(xml_file_path):
     for eq_constraint in equality_constraints.iter("EqualityConstraint"):
         constraint_name = eq_constraint.get("Name")
         constraint_value = eq_constraint.get("Value")
-        equality_constraints_data.append({"ConstraintName": constraint_name, "ConstraintValue": literal_eval(constraint_value)})
+        constraint_in_out = eq_constraint.get("Type")
+        equality_constraints_data.append({"ConstraintName": constraint_name, 
+                                          "ConstraintValue": literal_eval(constraint_value), 
+                                          "In_Out": constraint_in_out})
 
     # Convert equality constraint data to DataFrame
     df_equality_constraints = pd.DataFrame(equality_constraints_data)
 
     df_equality_constraints["Type"] = "eq_cstr"
-    df_equality_constraints.columns = ["Name", "Value", "Type"]
+    df_equality_constraints.columns = ["Name", "Value", "In_Out", "Type"]
 
     all_dfs_array.append(df_equality_constraints)
 
@@ -96,13 +103,16 @@ def preprocess_xml(xml_file_path):
     for ineq_constraint in inequality_constraints.iter("InequalityConstraint"):
         constraint_name = ineq_constraint.get("Name")
         constraint_value = ineq_constraint.get("Value")
-        inequality_constraints_data.append({"ConstraintName": constraint_name, "ConstraintValue": literal_eval(constraint_value)})
+        constraint_in_out = ineq_constraint.get("Type")
+        inequality_constraints_data.append({"ConstraintName": constraint_name, 
+                                            "ConstraintValue": literal_eval(constraint_value), 
+                                            "In_Out": constraint_in_out})
 
     # Convert inequality constraint data to DataFrame
     df_inequality_constraints = pd.DataFrame(inequality_constraints_data)
 
     df_inequality_constraints["Type"] = "ineq_cstr"
-    df_inequality_constraints.columns = ["Name", "Value", "Type"]
+    df_inequality_constraints.columns = ["Name", "Value", "In_Out", "Type"]
 
     all_dfs_array.append(df_inequality_constraints)
 
@@ -111,20 +121,22 @@ def preprocess_xml(xml_file_path):
     free_outputs_data = []
     for free_output in free_outputs.iter("FreeOutput"):
         output_name = free_output.get("Name")
-        free_outputs_data.append({"OutputName": output_name})
+        free_in_out = free_output.get("Type")
+        free_outputs_data.append({"OutputName": output_name, "In_Out": free_in_out})
 
     # Convert free output data to DataFrame
     df_free_outputs = pd.DataFrame(free_outputs_data)
   
     df_free_outputs["Type"] = "free"
-    df_free_outputs.columns = ["Name", "Type"]
+    df_free_outputs.columns = ["Name", "In_Out", "Type"]
 
     # Filter out the objectives
     df_free_outputs = df_free_outputs[~df_free_outputs["Name"].isin(objectives)]
 
     all_dfs_array.append(df_free_outputs)
 
-  specifications_df = pd.DataFrame(columns=["Name", "Value", "Type"])
+  specifications_df = pd.DataFrame(columns=["Name", "Value", "In_Out", "Type"])
+
   for i in all_dfs_array:
     specifications_df = pd.concat([specifications_df, i], axis=0)
 
@@ -134,7 +146,7 @@ def preprocess_xml(xml_file_path):
 
 # Path to your XML file
 
-xml_file_path = "data/example20_new.result"
+xml_file_path = "data/example20.result"
 df, option_list, specifications_df, objectives = preprocess_xml(xml_file_path)
 
 ### Tk App ###
@@ -159,7 +171,6 @@ notebook.add(tab2, text="2-var-plot")
 
 # Create the first tab and add the App and ImageWindow instances from program1
 tab3 = ttk.Frame(notebook)
-all_options3 = ["Updated_Pareto", "Pareto"]
 app3 = App3(tab3, ["Updated_Pareto", "Pareto"], df, objectives)
 notebook.add(tab3, text="Pareto")
 

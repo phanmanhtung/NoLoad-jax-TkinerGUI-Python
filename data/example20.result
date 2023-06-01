@@ -802,5 +802,50 @@
 			</Outputs>
 		</Iteration>
 	</Iterations>
-	<SPECIFICATIONS/>
+	<SPECIFICATIONS>
+		<BoundsOfInputs Number="15">
+			<Bounds Type="Input" Value="[1.0, 20.0]" Name="p"/>
+			<Bounds Type="Input" Value="[1.0, 1000.0]" Name="f"/>
+			<Bounds Type="Input" Value="[1000.0, 1150.0]" Name="Ns"/>
+			<Bounds Type="Input" Value="[0.1, 100.0]" Name="Isa"/>
+			<Bounds Type="Input" Value="[1.0, 10.0]" Name="j"/>
+			<Bounds Type="Input" Value="[0.001, 1.0]" Name="g"/>
+			<Bounds Type="Input" Value="[0.001, 0.2]" Name="Ld"/>
+			<Bounds Type="Input" Value="[0.001, 0.5]" Name="He"/>
+			<Bounds Type="Input" Value="[0.001, 0.5]" Name="Lc"/>
+			<Bounds Type="Input" Value="[0.001, 0.5]" Name="Hc"/>
+			<Bounds Type="Input" Value="[0.005, 1.0]" Name="Ps"/>
+			<Bounds Type="Input" Value="[0.002, 0.003]" Name="ent"/>
+			<Bounds Type="Input" Value="[0.01, 0.1]" Name="d"/>
+			<Bounds Type="Input" Value="[700.0, 720.0]" Name="Tinduit"/>
+			<Bounds Type="Input" Value="[100.0, 120.0]" Name="Tbob"/>
+		</BoundsOfInputs>
+		<ObjectiveFunctions Number="2">
+			<Objective Type="Output" Value="[0.0, 1.0]" Name="Volume"/>
+			<Objective Type="Output" Value="[0.0, 900.0]" Name="PertesTotales"/>
+		</ObjectiveFunctions>
+		<EqualityConstraints Number="2">
+			<EqualityConstraint Type="Output" Value="60.0" Name="Debit"/>
+			<EqualityConstraint Type="Output" Value="27.0" Name="Pression"/>
+		</EqualityConstraints>
+		<InequalityConstraints Number="6">
+			<InequalityConstraint Type="Output" Value="[200.0, 325.0]" Name="Vsa"/>
+			<InequalityConstraint Type="Output" Value="[0.0, 5.0]" Name="ctrle"/>
+			<InequalityConstraint Type="Output" Value="[0.0, 5.0]" Name="ctrld"/>
+			<InequalityConstraint Type="Output" Value="[0.1, 1.7]" Name="BsDent"/>
+			<InequalityConstraint Type="Output" Value="[0.1, 1.7]" Name="BsCulasse"/>
+			<InequalityConstraint Type="Output" Value="[0.1, 1.7]" Name="BsDentExterne"/>
+		</InequalityConstraints>
+		<FreeOutputs Number="9">
+			<FreeOutput Type="Output" Name="PertesTotales"/>
+			<FreeOutput Type="Output" Name="Volume"/>
+			<FreeOutput Type="Output" Name="Rendement"/>
+			<FreeOutput Type="Output" Name="ForceX"/>
+			<FreeOutput Type="Output" Name="PuissanceUtile"/>
+			<FreeOutput Type="Output" Name="PJouleInduit"/>
+			<FreeOutput Type="Output" Name="PJouleInducteur"/>
+			<FreeOutput Type="Output" Name="PmagnetiqueStator"/>
+			<FreeOutput Type="Output" Name="pu"/>
+		</FreeOutputs>
+	</SPECIFICATIONS>
 </Optimization>
