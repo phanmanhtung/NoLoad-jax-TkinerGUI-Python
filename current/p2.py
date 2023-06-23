@@ -78,24 +78,17 @@ class App:
         selected_x = self.selected_x.get()
         selected_y = self.selected_y.get()
 
+        sorted_X_df = self.df.sort_values(by=[selected_x])
+
         # Get the arrays of values for the selected options
-        x_values = self.df[selected_x].values
-        y_values = self.df[selected_y].values
-
-        # Group x_values and y_values into pairs
-        pairs = list(zip(x_values, y_values))
-
-        # Sort pairs by x
-        sorted_pairs = sorted(pairs, key=lambda pair: pair[0])
-
-        # Unzip the sorted pairs into x_values and y_values
-        x_values, y_values = zip(*sorted_pairs)
+        x_values = sorted_X_df[selected_x].values
+        y_values = sorted_X_df[selected_y].values
 
         fig, ax = plt.subplots()
         ax.plot(x_values, y_values)
         ax.scatter(x_values, y_values)
 
-        for iteration, x, y in zip(self.df['IterationNumber'], x_values, y_values):
+        for iteration, x, y in zip(sorted_X_df['IterationNumber'], x_values, y_values):
             ax.annotate(iteration, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', va='bottom')
 
         ax.grid()

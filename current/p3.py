@@ -34,10 +34,12 @@ def excluded_dataframe(df, objectives):
     return updated_df
 
 
-def plot_2d(ax, df, label, objectives):
+def plot_2d(ax, df, label, objectives, if_line=1):
 
-    ax.plot(df[objectives[0]], df[objectives[1]])
-    ax.scatter(df[objectives[0]], df[objectives[1]])
+    if if_line == 1:
+        ax.plot(df[objectives[0]], df[objectives[1]], color='midnightblue')
+
+    ax.scatter(df[objectives[0]], df[objectives[1]], color='midnightblue')
     ax.set_xlabel(objectives[0])
     ax.set_ylabel(objectives[1])
     ax.ticklabel_format(useOffset=False, style='plain')
@@ -107,7 +109,7 @@ class App:
 
     def plot_multiple_selected_options(self):
         fig, ax = plt.subplots()
-        plot_2d(ax, self.df, self.selected_options[0], self.objectives)
+        plot_2d(ax, self.df, self.selected_options[0], self.objectives, if_line=0)
         updated_df = excluded_dataframe(self.df, self.objectives)
 
         plot_2d(ax, updated_df, self.selected_options[1], self.objectives)
